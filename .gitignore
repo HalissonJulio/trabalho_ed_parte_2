@@ -1,0 +1,53 @@
+# --- Arquivos de Compilação (C/C++) ---
+# Ignora arquivos objetos criados durante a compilação
+*.o
+*.obj
+
+# Ignora arquivos de debug e bibliotecas estáticas/dinâmicas
+*.d
+*.a
+*.lib
+*.so
+*.dll
+*.dylib
+
+# --- Executáveis ---
+# Ignora executáveis padrão do Windows e Linux/Mac
+*.exe
+*.out
+*.app
+
+# Ignora o nome provável do seu executável gerado pelo Makefile
+# (Adicione outros nomes aqui se o seu Makefile gerar algo diferente de 'main')
+main
+tp2
+prog
+
+# --- Arquivos Temporários e de Editores ---
+# VS Code
+.vscode/
+*.code-workspace
+
+# CLion / IntelliJ
+.idea/
+cmake-build-debug/
+
+# Vim / Emacs (arquivos de backup automáticos)
+*~
+*.swp
+*.swo
+\#*#
+
+# Mac OS (Metadados de pasta)
+.DS_Store
+
+# Windows
+Thumbs.db
+Desktop.ini
+
+# --- Outros ---
+# Logs de execução ou erros
+*.log
+
+# Se você gerar arquivos CSV de teste que não quer enviar, descomente a linha abaixo:
+# teste_*.csv
