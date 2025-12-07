@@ -48,7 +48,7 @@ O sistema agora é um gerenciador completo (CRUD), permitindo não apenas a cons
     make clean
     ```
 
-**Nota Importante:** O sistema espera encontrar os arquivos `times.csv` e `bd_partidas.csv` na pasta raiz para carregar os dados iniciais.
+**Nota Importante:** O sistema espera encontrar os arquivos `bd_times.csv` e `bd_partidas.csv` na pasta raiz para carregar os dados iniciais.
 
 -----
 
@@ -63,7 +63,7 @@ O código foi modularizado seguindo o padrão de Tipos Abstratos de Dados (TADs)
 ├── README.md              \# Documentação do projeto
 ├── main.c                 \# Interface com o usuário (Menus e persistência)
 │
-├── bd\_times.csv              \# Banco de dados de Times (Leitura)
+├── bd\_times.csv           \# Banco de dados de Times (Leitura)
 ├── bd\_partidas.csv        \# Banco de dados de Partidas (Leitura e Escrita - Persistência)
 ├── bd\_classificacao.csv   \# Relatório final gerado automaticamente (Saída)
 │
