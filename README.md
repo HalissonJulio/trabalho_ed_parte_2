@@ -38,12 +38,12 @@ O sistema agora é um gerenciador completo (CRUD), permitindo a inserção, remo
    * **Windows:**
 
      ```bash
-     .\main.exe
+     .\campeonato.exe
      ```
    * **Linux/macOS:**
 
      ```bash
-     ./main
+     ./campeonato
      ```
 
 3. **Limpeza** (opcional – remove os arquivos compilados):
