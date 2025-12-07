@@ -260,7 +260,7 @@ void bd_times_imprime_classificacao(const BDTimes *bd) {
 void bd_times_consulta_por_prefixo(const BDTimes *bd, const char *prefixo) {
     if (bd == NULL || prefixo == NULL) return;
     
-    printf("Buscando times com nome que começa com '%s'...\n", prefixo);
+    printf("Buscando times com nome que comeca com '%s'...\n", prefixo);
 
     int contador = 0;
     int primeira_impressao = 1;
@@ -279,7 +279,7 @@ void bd_times_consulta_por_prefixo(const BDTimes *bd, const char *prefixo) {
     }
 
     if (contador == 0) {
-        printf("Nenhum time encontrado com o nome que começa com '%s'.\n", prefixo);
+        printf("Nenhum time encontrado com o nome que comeca com '%s'.\n", prefixo);
     } else {
         printf("------------------------------------------------------------------------\n");
         printf("\n%d time(s) encontrado(s).\n", contador);

@@ -300,7 +300,7 @@ int main() {
                 bd_times_libera(bd_times);
                 bd_partidas_libera(bd_partidas);
                 return 0;
-        
+        }
         if (pausar) {
             printf("\n[Sistema]\nPressione Enter para continuar...");
             ler_linha_stdin(dummy_buffer, MAX_INPUT); 
