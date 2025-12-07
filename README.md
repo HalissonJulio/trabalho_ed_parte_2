@@ -38,7 +38,7 @@ O sistema agora é um gerenciador completo (CRUD), permitindo a inserção, remo
    * **Windows:**
 
      ```bash
-     .\campeonato.exe
+     ./campeonato.exe
      ```
    * **Linux/macOS:**
 
