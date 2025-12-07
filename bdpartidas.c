@@ -358,3 +358,30 @@ int bd_partidas_atualizar(BDPartidas *bd, BDTimes *bd_times, int id, int novo_go
 
     return 0;
 }
+
+int bd_partidas_salvar(BDPartidas *bd, const char *nome_arquivo) {
+    if (bd == NULL) return 0;
+
+    FILE *arquivo = fopen(nome_arquivo, "w");
+    if (arquivo == NULL) {
+        perror("Erro ao abrir arquivo de partidas para salvar");
+        return 0;
+    }
+
+    // Cabeçalho esperado
+    fprintf(arquivo, "ID,Time1,Time2,GolsTime1,GolsTime2\n");
+
+    NoPartida *atual = bd->inicio;
+    while (atual != NULL) {
+        Partida *p = atual->partida;
+        fprintf(arquivo, "%d,%d,%d,%d,%d\n",
+                partida_obter_id(p),
+                partida_obter_time1_id(p),
+                partida_obter_time2_id(p),
+                partida_obter_gols_time1(p),
+                partida_obter_gols_time2(p));
+        atual = atual->prox;
+    }
+    fclose(arquivo);
+    return 1;
+}

@@ -4,7 +4,7 @@
 #include "partida.h" // Depende do TAD Partida
 #include "bdtimes.h" // Necessário para acessar o nome dos times e atualizar estatísticas
 
-#define ARQUIVO_PARTIDAS "partidas.csv" // Nome padrão do arquivo de partidas
+#define ARQUIVO_PARTIDAS "bd_partidas.csv" // Nome padrão do arquivo de partidas
 
 // Define a estrutura BDPartidas (tipo opaco)
 typedef struct bdpartidas BDPartidas;
@@ -39,5 +39,8 @@ int bd_partidas_remover(BDPartidas *bd, BDTimes *bd_times, int id);
 // Atualiza o placar de uma partida e ajusta as estatísticas (remove antigas, soma novas)
 // Retorna 1 se atualizado com sucesso, 0 se ID não encontrado
 int bd_partidas_atualizar(BDPartidas *bd, BDTimes *bd_times, int id, int novo_placar1, int novo_placar2);
+
+// Salva as partidas no csv
+int bd_partidas_salvar(BDPartidas *bd, const char *nome_arquivo);
 
 #endif // BDPARTIDAS_H

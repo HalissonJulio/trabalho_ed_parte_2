@@ -3,7 +3,7 @@
 
 #include "time.h" // Depende do TAD Time
 
-#define ARQUIVO_TIMES "times.csv" // Nome padrão do arquivo de times
+#define ARQUIVO_TIMES "bd_times.csv" // Nome padrão do arquivo de times
 
 // Define a estrutura BDTimes (tipo opaco)
 typedef struct bdtimes BDTimes;
@@ -24,6 +24,8 @@ void bd_times_imprime_classificacao(const BDTimes *bd);
 
 // Consulta e imprime as estatísticas de times por prefixo de nome
 void bd_times_consulta_por_prefixo(const BDTimes *bd, const char *prefixo);
+
+int bd_times_escrever_csv(BDTimes *bd, const char *nome_arquivo);
 
 // --- Funções de Acesso e Auxiliares ---
 

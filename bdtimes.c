@@ -144,6 +144,40 @@ int bd_times_carrega_arquivo(BDTimes *bd, const char *nome_arquivo) {
     return contador;
 }
 
+int bd_times_escrever_csv(BDTimes *bd, const char *nome_arquivo) {
+    if (bd == NULL) return 0;
+
+    // Garante a ordenação antes de salvar
+    bd_times_ordenar(bd);
+
+    FILE *arquivo = fopen(nome_arquivo, "w");
+    if (arquivo == NULL) {
+        perror("Erro ao criar arquivo de classificacao");
+        return 0;
+    }
+
+    // Cabeçalho conforme especificação
+    fprintf(arquivo, "ID,Time,V,E,D,GM,GS,S,PG\n");
+
+    NoTime *atual = bd->inicio;
+    while (atual != NULL) {
+        Time *t = atual->time;
+        fprintf(arquivo, "%d,%s,%d,%d,%d,%d,%d,%d,%d\n",
+                time_obter_id(t),
+                time_obter_nome(t),
+                time_obter_vitorias(t),
+                time_obter_empates(t),
+                time_obter_derrotas(t),
+                time_obter_gols_marcados(t),
+                time_obter_gols_sofridos(t),
+                time_obter_saldo(t),
+                time_obter_pontos(t));
+        atual = atual->prox;
+    }
+    fclose(arquivo);
+    return 1;
+}
+
 // ========================================================================
 // Funcionalidades da Parte II (Ordenação)
 // ========================================================================

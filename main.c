@@ -48,9 +48,6 @@ void executar_consulta_time(BDTimes *bd_times) {
     bd_times_consulta_por_prefixo(bd_times, prefixo);
 }
 
-// PARAMETRO NOVO: 'manter_loop'
-// Se 1: Fica no loop (para consulta pura).
-// Se 0: Executa uma busca e retorna 1 imediatamente (para atualizar/remover).
 int executar_consulta_partida(BDPartidas *bd_partidas, BDTimes *bd_times, int manter_loop) {
     char opcao_str[MAX_INPUT]; 
     char prefixo[MAX_INPUT];
@@ -62,10 +59,7 @@ int executar_consulta_partida(BDPartidas *bd_partidas, BDTimes *bd_times, int ma
         ler_linha_stdin(opcao_str, MAX_INPUT);
         char opcao_char = opcao_str[0]; 
 
-        // Se escolher 4, é SEMPRE Cancelar/Sair
         if (opcao_char == '4') {
-            // Se estava em loop e buscou algo, retorna 1 (só informativo)
-            // Se era pra atualizar (loop=0), retorna 0 para abortar.
             if (manter_loop) return realizou_busca;
             else return 0; 
         }
@@ -87,9 +81,8 @@ int executar_consulta_partida(BDPartidas *bd_partidas, BDTimes *bd_times, int ma
         printf("\n[Sistema]\nPressione Enter para continuar...");
         ler_linha_stdin(prefixo, MAX_INPUT); 
 
-        // SE NÃO É PARA MANTER O LOOP (Atualizar/Remover), SAI AGORA E VAI PRO ID
         if (!manter_loop) {
-            return 1; // Retorna 1 indicando que a busca foi feita e deve prosseguir
+            return 1; 
         }
     }
 }
@@ -128,9 +121,8 @@ int executar_inserir_partida(BDPartidas *bd_partidas, BDTimes *bd_times) {
 int executar_remover_partida(BDPartidas *bd_partidas, BDTimes *bd_times) {
     printf("\n[Sistema]\nPrimeiro, busque a partida para encontrar seu ID.\n");
     
-    // Passa 0: Executa busca uma vez e sai. Se escolher 4, retorna 0.
     if (executar_consulta_partida(bd_partidas, bd_times, 0) == 0) {
-        return 0; // Sai da função sem pedir ID
+        return 0; 
     }
 
     char buffer[MAX_INPUT];
@@ -166,9 +158,8 @@ int executar_remover_partida(BDPartidas *bd_partidas, BDTimes *bd_times) {
 int executar_atualizar_partida(BDPartidas *bd_partidas, BDTimes *bd_times) {
     printf("\n[Sistema]\nPrimeiro, busque a partida para encontrar seu ID.\n");
     
-    // Passa 0: Executa busca uma vez e sai. Se escolher 4, retorna 0.
     if (executar_consulta_partida(bd_partidas, bd_times, 0) == 0) {
-        return 0; // Sai da função sem pedir ID
+        return 0;
     }
 
     char buffer[MAX_INPUT];
@@ -252,18 +243,15 @@ int main() {
                 break;
 
             case '2': 
-                // Consulta pura: MANTÉM O LOOP (passa 1)
                 executar_consulta_partida(bd_partidas, bd_times, 1); 
                 pausar = 0; 
                 break;
 
             case '3': 
-                // Atualizar: SEM LOOP (passa 0). Buscou -> Vai pro ID. Cancelou -> Sai.
                 if (executar_atualizar_partida(bd_partidas, bd_times) == 0) pausar = 0;
                 break;
 
             case '4': 
-                // Remover: SEM LOOP (passa 0).
                 if (executar_remover_partida(bd_partidas, bd_times) == 0) pausar = 0;
                 break;
 
@@ -277,15 +265,41 @@ int main() {
 
             case 'Q':
             case 'q':
+                printf("[Sistema]\nSalvando dados...\n");
+                
+                // 1. Salva as partidas em 'bd_partidas.csv'
+                if (bd_partidas_salvar(bd_partidas, ARQUIVO_PARTIDAS)) {
+                    printf("- Arquivo '%s' atualizado.\n", ARQUIVO_PARTIDAS);
+                } else {
+                    printf("- Erro ao salvar partidas.\n");
+                }
+
+                // 2. Lógica para o 'bd_classificacao.csv' (Gerado ou Atualizado?)
+                const char* arq_classificacao = "bd_classificacao.csv";
+                int arquivo_existia = 0;
+                
+                // Tenta abrir para leitura apenas para ver se existe
+                FILE *f_teste = fopen(arq_classificacao, "r");
+                if (f_teste != NULL) {
+                    arquivo_existia = 1;
+                    fclose(f_teste); // Fecha logo em seguida
+                }
+
+                // Gera/Sobrescreve o arquivo
+                if (bd_times_escrever_csv(bd_times, arq_classificacao)) {
+                    if (arquivo_existia) {
+                        printf("- Arquivo '%s' atualizado.\n", arq_classificacao);
+                    } else {
+                        printf("- Arquivo '%s' gerado.\n", arq_classificacao);
+                    }
+                } else {
+                    printf("- Erro ao gerar classificacao.\n");
+                }
+
                 printf("[Sistema]\nEncerrando o sistema. Adeus!\n");
                 bd_times_libera(bd_times);
                 bd_partidas_libera(bd_partidas);
                 return 0;
-
-            default:
-                printf("[Sistema]\nOpcao invalida! Tente novamente.\n");
-                break;
-        }
         
         if (pausar) {
             printf("\n[Sistema]\nPressione Enter para continuar...");

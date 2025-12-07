@@ -65,14 +65,24 @@ int time_obter_id(const Time* time) {
     return (time != NULL) ? time->id : -1;
 }
 
-// --- NOVOS GETTERS (Parte 2 - Critérios de Desempate) ---
-
 int time_obter_vitorias(const Time* time) {
     return (time != NULL) ? time->vitorias : 0;
 }
 
 int time_obter_gols_marcados(const Time* time) {
     return (time != NULL) ? time->gols_marcados : 0;
+}
+
+int time_obter_empates(const Time* time) {
+    return (time != NULL) ? time->empates : 0;
+}
+
+int time_obter_derrotas(const Time* time) {
+    return (time != NULL) ? time->derrotas : 0;
+}
+
+int time_obter_gols_sofridos(const Time* time) {
+    return (time != NULL) ? time->gols_sofridos : 0;
 }
 
 // --------------------------------------------------------------------------
@@ -95,7 +105,6 @@ void time_registra_partida(Time* time, int gols_marcados, int gols_sofridos) {
     }
 }
 
-// --- NOVA FUNÇÃO (Parte 2) ---
 // Reverte as estatísticas subtraindo um resultado de partida anterior.
 void time_desfaz_partida(Time* time, int gols_marcados, int gols_sofridos) {
     if (time == NULL) return;
