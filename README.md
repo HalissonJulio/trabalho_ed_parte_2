@@ -1,5 +1,3 @@
-Aqui está o `README.md` atualizado. Adicionei a seção de **Persistência e Relatórios** e ajustei a árvore de arquivos para refletir os nomes corretos (`bd_partidas.csv` e `bd_classificacao.csv`) e a lógica de feedback ao usuário que implementamos.
-
 ````markdown
 # Campeonato Computacional de Futebol (Parte II)
 
