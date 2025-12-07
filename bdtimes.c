@@ -4,46 +4,49 @@
 #include "bdtimes.h"
 #include "time.h" 
 
-#define MAX_TIMES 10
 #define MAX_LINHA_CSV 100 
 
-// Estrutura interna do TAD BDTimes (Vetor Estático)
+// ========================================================================
+// Estruturas de Dados (Lista Encadeada)
+// ========================================================================
+
+// Nó da lista encadeada de times
+typedef struct NoTime {
+    Time *time;
+    struct NoTime *prox;
+} NoTime;
+
+// Estrutura interna do TAD BDTimes (Agora dinâmica)
 struct bdtimes {
-    Time *times[MAX_TIMES]; 
+    NoTime *inicio;
     int total_times;        
 };
 
 // ========================================================================
-// Funções de Gerenciamento do BD (Implementação)
+// Funções Auxiliares (Privadas)
 // ========================================================================
 
-// Cria e inicializa o gerenciador de times.
-BDTimes* bd_times_cria() {
-    BDTimes *bd = (BDTimes*) malloc(sizeof(BDTimes));
-    if (bd == NULL) {
-        perror("[Sistema]\nErro ao alocar BDTimes");
-        return NULL;
-    }
+// Insere um time no final da lista encadeada
+static void inserir_time_na_lista(BDTimes *bd, Time *t) {
+    NoTime *novo = (NoTime*) malloc(sizeof(NoTime));
+    if (!novo) return;
+    
+    novo->time = t;
+    novo->prox = NULL;
 
-    bd->total_times = 0;
-    for (int i = 0; i < MAX_TIMES; i++) {
-        bd->times[i] = NULL;
-    }
-    return bd;
-}
-
-// Destroi o banco de dados e libera a memória de todos os times.
-void bd_times_libera(BDTimes *bd) {
-    if (bd == NULL) return;
-    for (int i = 0; i < MAX_TIMES; i++) {
-        if (bd->times[i] != NULL) {
-            time_libera(bd->times[i]); 
+    if (bd->inicio == NULL) {
+        bd->inicio = novo;
+    } else {
+        NoTime *atual = bd->inicio;
+        while (atual->prox != NULL) {
+            atual = atual->prox;
         }
+        atual->prox = novo;
     }
-    free(bd);
+    bd->total_times++;
 }
 
-// Função auxiliar para analisar (parse) a linha CSV do time.
+// Analisa a linha CSV do time (Mantida da Parte 1)
 static int analisar_linha_time_csv(char *linha, int *id, char *nome_buffer) {
     char *token;
     int campo = 0;
@@ -58,7 +61,7 @@ static int analisar_linha_time_csv(char *linha, int *id, char *nome_buffer) {
     campo++;
 
     // Campo 1: Nome
-    token = strtok(NULL, "\n"); // Lê o resto da linha
+    token = strtok(NULL, "\n"); 
     if (token == NULL) return 0;
     strncpy(nome_buffer, token, 49); 
     nome_buffer[49] = '\0';
@@ -67,19 +70,54 @@ static int analisar_linha_time_csv(char *linha, int *id, char *nome_buffer) {
     return campo == 2;
 }
 
+// ========================================================================
+// Funções de Gerenciamento do BD (Implementação)
+// ========================================================================
+
+// Cria e inicializa o gerenciador de times.
+BDTimes* bd_times_cria() {
+    BDTimes *bd = (BDTimes*) malloc(sizeof(BDTimes));
+    if (bd == NULL) {
+        perror("[Sistema]\nErro ao alocar BDTimes");
+        return NULL;
+    }
+
+    bd->inicio = NULL;
+    bd->total_times = 0;
+    return bd;
+}
+
+// Destroi o banco de dados e libera a memória de todos os times.
+void bd_times_libera(BDTimes *bd) {
+    if (bd == NULL) return;
+    
+    NoTime *atual = bd->inicio;
+    while (atual != NULL) {
+        NoTime *temp = atual;
+        atual = atual->prox;
+        
+        // Libera o objeto Time e o nó da lista
+        if (temp->time) time_libera(temp->time);
+        free(temp);
+    }
+    free(bd);
+}
+
 // Carrega os dados dos times a partir do arquivo CSV.
 int bd_times_carrega_arquivo(BDTimes *bd, const char *nome_arquivo) {
     if (bd == NULL) return -1;
 
     FILE *arquivo = fopen(nome_arquivo, "r");
     if (arquivo == NULL) {
-        // Erro silencioso
-        return -1;
+        return -1; // Erro silencioso
     }
 
     char linha[MAX_LINHA_CSV];
     int primeira_linha = 1;
     int contador = 0;
+
+    // Limpa lista anterior se houver (para evitar duplicatas em recargas)
+    // (Opcional, assumindo carregamento único na inicialização)
 
     while (fgets(linha, sizeof(linha), arquivo) != NULL) {
         if (primeira_linha) {
@@ -94,30 +132,68 @@ int bd_times_carrega_arquivo(BDTimes *bd, const char *nome_arquivo) {
         char nome_buffer[50];
         
         if (analisar_linha_time_csv(linha_copia, &id, nome_buffer)) {
-            if (id >= 0 && id < MAX_TIMES) {
-                if (bd->times[id] != NULL) {
-                    time_libera(bd->times[id]); // Libera se já existir
-                }
-                
-                bd->times[id] = time_cria(id, nome_buffer);
-                
-                if (bd->times[id] != NULL) {
-                    contador++;
-                }
-            } else {
-                // Aviso silencioso de ID inválido
+            Time *novo_time = time_cria(id, nome_buffer);
+            if (novo_time) {
+                inserir_time_na_lista(bd, novo_time);
+                contador++;
             }
         }
     }
 
     fclose(arquivo);
-    bd->total_times = contador;
     return contador;
 }
 
+// ========================================================================
+// Funcionalidades da Parte II (Ordenação)
+// ========================================================================
+
+// Ordena a lista de times por mérito esportivo (PG > V > S)
+void bd_times_ordenar(BDTimes *bd) {
+    if (bd == NULL || bd->inicio == NULL || bd->inicio->prox == NULL) return;
+
+    int trocou;
+    do {
+        trocou = 0;
+        NoTime *atual = bd->inicio;
+
+        while (atual->prox != NULL) {
+            Time *t1 = atual->time;
+            Time *t2 = atual->prox->time;
+            int deve_trocar = 0;
+
+            // Critérios de Classificação (Decrescente):
+            // 1. Pontos Ganhos (PG)
+            if (time_obter_pontos(t2) > time_obter_pontos(t1)) {
+                deve_trocar = 1;
+            } 
+            else if (time_obter_pontos(t2) == time_obter_pontos(t1)) {
+                // 2. Vitórias (V)
+                if (time_obter_vitorias(t2) > time_obter_vitorias(t1)) {
+                    deve_trocar = 1;
+                }
+                else if (time_obter_vitorias(t2) == time_obter_vitorias(t1)) {
+                    // 3. Saldo de Gols (S)
+                    if (time_obter_saldo(t2) > time_obter_saldo(t1)) {
+                        deve_trocar = 1;
+                    }
+                }
+            }
+
+            if (deve_trocar) {
+                // Troca apenas os dados (ponteiros de Time) para simplificar
+                Time *temp = atual->time;
+                atual->time = atual->prox->time;
+                atual->prox->time = temp;
+                trocou = 1;
+            }
+            atual = atual->prox;
+        }
+    } while (trocou);
+}
 
 // ========================================================================
-// Funcionalidades da Parte I (Implementação)
+// Funcionalidades da Parte I (Adaptadas para Lista Encadeada)
 // ========================================================================
 
 // Imprime as estatísticas de todos os times (Funcionalidade 6).
@@ -129,12 +205,17 @@ void bd_times_imprime_classificacao(const BDTimes *bd) {
         return;
     }
 
+    // ORDENAÇÃO: Requisito da Parte 2
+    // Como o parâmetro é const, fazemos um cast para ordenar internamente antes de exibir
+    // (Ou a função deveria receber sem const, mas para manter compatibilidade fazemos assim)
+    bd_times_ordenar((BDTimes*)bd);
+
     time_imprimir_cabecalho();
     
-    for (int i = 0; i < MAX_TIMES; i++) {
-        if (bd->times[i] != NULL) {
-            time_imprimir(bd->times[i]);
-        }
+    NoTime *atual = bd->inicio;
+    while (atual != NULL) {
+        time_imprimir(atual->time);
+        atual = atual->prox;
     }
     
     printf("------------------------------------------------------------------------\n");
@@ -150,19 +231,17 @@ void bd_times_consulta_por_prefixo(const BDTimes *bd, const char *prefixo) {
     int contador = 0;
     int primeira_impressao = 1;
 
-    for (int i = 0; i < MAX_TIMES; i++) {
-        Time* time_atual = bd->times[i];
-        
-        if (time_atual != NULL && time_nome_comeca_com(time_atual, prefixo)) {
-            
+    NoTime *atual = bd->inicio;
+    while (atual != NULL) {
+        if (time_nome_comeca_com(atual->time, prefixo)) {
             if (primeira_impressao) {
                 time_imprimir_cabecalho();
                 primeira_impressao = 0;
             }
-            
-            time_imprimir(time_atual);
+            time_imprimir(atual->time);
             contador++;
         }
+        atual = atual->prox;
     }
 
     if (contador == 0) {
@@ -173,7 +252,6 @@ void bd_times_consulta_por_prefixo(const BDTimes *bd, const char *prefixo) {
     }
 }
 
-
 // ========================================================================
 // Funções de Acesso e Auxiliares
 // ========================================================================
@@ -182,9 +260,13 @@ void bd_times_consulta_por_prefixo(const BDTimes *bd, const char *prefixo) {
 Time* bd_times_busca_por_id(BDTimes *bd, int id) {
     if (bd == NULL) return NULL;
 
-    if (id >= 0 && id < MAX_TIMES) {
-        return bd->times[id]; 
+    NoTime *atual = bd->inicio;
+    while (atual != NULL) {
+        if (time_obter_id(atual->time) == id) {
+            return atual->time;
+        }
+        atual = atual->prox;
     }
 
-    return NULL; // ID fora do range
+    return NULL; // Não encontrado
 }

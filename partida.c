@@ -74,11 +74,11 @@ void partida_imprimir_cabecalho() {
 void partida_imprimir(const Partida* p, const BDTimes* bd_times) {
     if (p == NULL || bd_times == NULL) return;
 
-    // Busca os nomes dos times usando as funções de acesso traduzidas
+    // Busca os nomes dos times usando as funções de acesso
     Time* t1 = bd_times_busca_por_id((BDTimes*)bd_times, partida_obter_time1_id(p));
     Time* t2 = bd_times_busca_por_id((BDTimes*)bd_times, partida_obter_time2_id(p));
 
-    // Obtém os nomes (assumindo que o getter do Time foi traduzido para time_obter_nome)
+    // Obtém os nomes
     const char* nome1 = (t1 != NULL) ? time_obter_nome(t1) : "N/A";
     const char* nome2 = (t2 != NULL) ? time_obter_nome(t2) : "N/A";
 
@@ -92,4 +92,16 @@ void partida_imprimir(const Partida* p, const BDTimes* bd_times) {
            nome1,
            placar,
            nome2);
+}
+
+// --------------------------------------------------------------------------
+// Funcionalidades da Parte II (Novas)
+// --------------------------------------------------------------------------
+
+// Atualiza os gols de uma partida existente
+void partida_set_gols(Partida* p, int novo_gols1, int novo_gols2) {
+    if (p != NULL) {
+        p->gols_time1 = novo_gols1;
+        p->gols_time2 = novo_gols2;
+    }
 }

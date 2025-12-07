@@ -4,10 +4,10 @@
 #include <stdlib.h>
 #include "bdtimes.h" // Necessário para imprimir os nomes
 
-// Define a estrutura Partida (tipo opaco)
+// Define a estrutura Partida
 typedef struct partida Partida;
 
-// Estrutura interna de uma Partida (definição completa)
+// Estrutura interna de uma Partida
 struct partida {
     int id;
     int time1_id;     // ID do Time Mandante
@@ -48,5 +48,8 @@ void partida_imprimir_cabecalho();
 
 // Imprime uma partida formatada (ID Time1 Gols x Gols Time2)
 void partida_imprimir(const Partida* p, const BDTimes* bd_times);
+
+// Atualiza os gols de uma partida existente
+void partida_set_gols(Partida* p, int novo_gols1, int novo_gols2);
 
 #endif // PARTIDA_H

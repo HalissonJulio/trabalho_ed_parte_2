@@ -1,10 +1,10 @@
 #ifndef TIME_H
 #define TIME_H
 
-// Define a estrutura Time (tipo opaco)
+// Define a estrutura Time
 typedef struct time Time;
 
-// Estrutura interna de um Time (definição completa)
+// Estrutura interna de um Time 
 struct time {
   int id;
   char nome[50];
@@ -37,10 +37,21 @@ const char* time_obter_nome(const Time* time);
 // Retorna o ID do time
 int time_obter_id(const Time* time);
 
+// Retorna o número de vitórias (Critério de desempate 1)
+int time_obter_vitorias(const Time* time);
+
+// Retorna o número de gols marcados (Critério de desempate secundário/informativo)
+int time_obter_gols_marcados(const Time* time);
+
 // --- Funções de Manipulação ---
 
-// Atualiza as estatísticas (V, E, D, GM, GS) com base em um resultado de partida
+// Atualiza as estatísticas (V, E, D, GM, GS) somando um resultado de partida
 void time_registra_partida(Time* time, int gols_marcados, int gols_sofridos);
+
+// --- NOVA FUNÇÃO (Parte 2 - Necessária para Remover ou Atualizar) ---
+
+// Reverte as estatísticas subtraindo um resultado de partida anterior.
+void time_desfaz_partida(Time* time, int gols_marcados, int gols_sofridos);
 
 // --- Funções Auxiliares de Impressão e Busca ---
 
