@@ -1,4 +1,3 @@
-````markdown
 # Campeonato Computacional de Futebol (Parte II)
 
 ## Descrição
